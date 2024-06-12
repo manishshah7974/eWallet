@@ -1,0 +1,67 @@
+Kafka Configuration :
+
+Download Kafka UnZip & Move to c:/
+In server.properties  --> log.dirs=c:/kafka/kafka-logs
+In zookeeper.properties --> dataDir=c:/kafka/zookeeper-data
+
+c:/kafka  --> cmd
+1.Running Zookeeper first :
+C:\kafka>.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+2. Running Kafka Server :
+PS C:\kafka> .\bin\windows\kafka-server-start.bat .\config\server.properties
+
+3. Creating Topic : 
+PS C:\kafka> .\bin\windows\kafka-topics.bat --create --topic test --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+
+4. List all Topic : 
+PS C:\kafka> .\bin\windows\kafka-topics.bat --list --bootstrap-server localhost:9092
+
+5. Adding topic
+PS C:\kafka> .\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
+abc
+{"hello":"world"}
+
+6. Consuming Topic
+PS C:\kafka> .\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
+abc
+{"hello":"world"}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Kafka Cluster with two Brokers 
+* Zookeeper should be same 
+
+Step 1: Edit the First Kafka Broker Configuration (server.properties)
+broker.id=0
+log.dirs=C:/kafka/kafka-logs
+listeners=PLAINTEXT://:9092
+zookeeper.connect=localhost:2181  
+
+Step 2: Edit the Second Kafka Broker Configuration (server-2.properties)
+broker.id=1
+log.dirs=C:/kafka/kafka-2-logs (Moved outside kakfa directory due to Locking issue)
+listeners=PLAINTEXT://:9093
+zookeeper.connect=localhost:2181
+
+Running both Broker :
+i) .\bin\windows\kafka-server-start.bat .\config\server.properties
+ii) .\bin\windows\kafka-server-start.bat .\config\server-2.properties
+
+Verifying Config (Creating On First Server)
+.\bin\windows\kafka-topics.bat --create --topic test-replica --bootstrap-server localhost:9092 --partitions 1 --replication-factor 2
+
+cd C:\kafka\kafka-x.y.z ( Describing topic on Second Server
+.\bin\windows\kafka-topics.bat --describe --topic test-replica --bootstrap-server localhost:9092
+
+Producing ->
+.\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test-replica
+ABC
+def
+
+Consuming ->
+.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test-replica --from-beginning
+ABC 
+def
+
+
