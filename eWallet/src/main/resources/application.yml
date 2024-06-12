@@ -1,0 +1,25 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092  # Kafka server address
+    consumer:
+      group-id: group_id  # Consumer group id
+      auto-offset-reset: earliest  # Start consuming from the earliest message
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+
+topics:
+  fundsTransfer: funds_transfer
+  kyc: kyc
+
+server:
+  port: 8081  #default port where the service will be started
+
+eureka:         #tells about the Eureka server details and its refresh time
+  client:
+    fetch-registry : true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    preferIpAddress: true
