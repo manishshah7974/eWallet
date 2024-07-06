@@ -16,9 +16,12 @@ public class EncryptionUtil {
     private static final String TRANSFORMATION = "AES";
 
     private final String secretKey;
+    private final String salt;   // for additional complexity
 
-    public EncryptionUtil(@Value("${encryption.secret-key}") String secretKey) {
+    public EncryptionUtil(@Value("${encryption.secret-key}") String secretKey,
+                          @Value("${encryption.salt}") String salt) {
         this.secretKey = secretKey;
+        this.salt = salt;
     }
 
     // Encrypt the given data using the provided secret key
@@ -26,7 +29,8 @@ public class EncryptionUtil {
         SecretKeySpec secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKey), ALGORITHM);
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+        String dataWithSalt = data + salt;
+        byte[] encryptedBytes = cipher.doFinal(dataWithSalt.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
@@ -36,7 +40,11 @@ public class EncryptionUtil {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
         byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
-        return new String(decryptedBytes);
+
+        // Remove the static salt from the decrypted data
+        String decryptedDataWithSalt = new String(decryptedBytes);
+        String data = decryptedDataWithSalt.substring(0, decryptedDataWithSalt.length() - salt.length());
+        return data;
     }
 
     // Generate a new AES key (optional utility method)
