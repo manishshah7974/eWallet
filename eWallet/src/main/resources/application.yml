@@ -1,9 +1,9 @@
 spring:
   kafka:
     bootstrap-servers: localhost:9092  # Kafka server address
-    consumer:
-      group-id: group_id  # Consumer group id
-      auto-offset-reset: earliest  # Start consuming from the earliest message
+#    consumer:
+#      group-id: group_id  # Consumer group id
+#      auto-offset-reset: earliest  # Start consuming from the earliest message
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
